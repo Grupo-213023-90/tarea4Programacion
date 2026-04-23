@@ -59,7 +59,7 @@ class App: # Estructura principal que controla todo el programa.
         self.lb = tk.Listbox(self.root, width=40) # Cuadro blanco que lista las reservas creadas.
         self.lb.pack(pady=10)
         
-        tk.Label(self.root, text="End Time:").pack()
+        tk.Label(self.root, text="End Time:").pack() #Mi primer commit de programación.
         self.end_in = tk.Entry(self.root) # Cuadro para anotar la hora de entrega de la sala.
         self.end_in.pack()
         
