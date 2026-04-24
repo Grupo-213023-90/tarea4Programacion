@@ -1,92 +1,282 @@
-# -*- coding: utf-8 -*- # Permite usar caracteres como tildes o la "ñ".
-import tkinter as tk # Carga las herramientas para crear la ventana.
-from tkinter import messagebox # Importa las alertas emergentes (ventanas de error).
-from logic import Usuario, ReservaSala # Importamos las clases del archivo logic.py
+"""
+Proyecto: Sistema Integral de Gestión - Software FJ
+Institución: Universidad Nacional Abierta y a Distancia (UNAD)
+Equipo de Desarrollo:
+- LUIS DAVID GOMEZ PINTO
+- JOSE GABRIEL CASTRO LOPEZ
+- JUAN ESTEBAN CARDENAS ALVAREZ
+- DIYEIN ERLENCY BOTERO BETANCOURT
+- FREDY ANDRES TANGARIFE CORREA
+"""
 
-class App: # Estructura principal que controla todo el programa.
-    def __init__(self, root): # Configuración inicial al abrir el programa.
-        self.root = root # Guarda la ventana principal en la memoria de la clase.
-        self.root.title("Study Room System") # Escribe el nombre en la parte superior de la ventana.
-        self.root.geometry("400x500") # Define el ancho y largo de la ventana en píxeles.
-        
-        self.auth = Usuario() # Crea el objeto que validará el login.
-        self.reservations = [] # Lista para almacenar las reservas
-        self.show_login() # Ordena mostrar la pantalla de inicio de sesión de inmediato.
+import logging
+from abc import ABC, abstractmethod
+from datetime import datetime
 
-    def clear(self): # Borra todo lo que hay en la ventana para dibujar algo nuevo.
-        for w in self.root.winfo_children(): w.destroy() # Busca cada botón o texto y lo elimina uno por uno.
+# ==========================================
+# 1. CONFIGURACIÓN DE LOGS
+# ==========================================
+logging.basicConfig(
+    filename='software_fj_logs.txt',
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
 
-    def show_login(self): # Dibuja los elementos del formulario de acceso.
-        self.clear()
-        tk.Label(self.root, text="LOGIN SYSTEM", font=("Arial", 14, "bold")).pack(pady=20) # Muestra el título principal en negrita.
-        
-        tk.Label(self.root, text="Username:").pack()
-        self.u_ent = tk.Entry(self.root) # Crea el cuadro para escribir el nombre de usuario.
-        self.u_ent.pack() 
-        
-        tk.Label(self.root, text="Password:").pack()
-        self.p_ent = tk.Entry(self.root, show="*") # Crea el cuadro de contraseña ocultando los caracteres con asteriscos.
-        self.p_ent.pack()
-        
-        tk.Button(self.root, text="Login", command=self.process_login).pack(pady=20) # Crea el botón que activa la validación al hacer clic.
+# ==========================================
+# 2. EXCEPCIONES PERSONALIZADAS
+# ==========================================
+class SistemaFJError(Exception):
+    """Clase base para excepciones del sistema."""
+    pass
 
-    def process_login(self): # Lógica que decide si entras o no al sistema.
-        if self.auth.validar(self.u_ent.get(), self.p_ent.get()): # Valida contra la clase Usuario
-            self.show_main() # Si los datos son correctos, abre el gestor de reservas.
-        else:
-            messagebox.showerror("Error", "Invalid credentials") # Si fallan, muestra una ventana de "Acceso Denegado".
+class DatosInvalidosError(SistemaFJError):
+    """Excepción para datos faltantes o incorrectos."""
+    pass
 
-    def show_main(self): # Crea la interfaz del Ejercicio 2 en idioma inglés.
-        self.clear()
-        tk.Label(self.root, text="RESERVATIONS MANAGER", font=("Arial", 12)).pack(pady=10)
-        
-        # Campos de entrada
-        tk.Label(self.root, text="Student Name:").pack()
-        self.name_in = tk.Entry(self.root) # Cuadro para el nombre del estudiante responsable.
-        self.name_in.pack()
-        
-        tk.Label(self.root, text="Hourly Rate:").pack()
-        self.rate_in = tk.Entry(self.root) # Cuadro para ingresar el precio por hora.
-        self.rate_in.pack()
-        
-        tk.Label(self.root, text="Start Time:").pack()
-        self.start_in = tk.Entry(self.root) # Cuadro para anotar la hora de inicio.
-        self.start_in.pack()
-        
-        tk.Button(self.root, text="Create Reservation", command=self.add_res).pack(pady=10)
-        
-        # Lista visual
-        self.lb = tk.Listbox(self.root, width=40) # Cuadro blanco que lista las reservas creadas.
-        self.lb.pack(pady=10)
-        
-        tk.Label(self.root, text="End Time:").pack() #Mi primer commit de programación.
-        self.end_in = tk.Entry(self.root) # Cuadro para anotar la hora de entrega de la sala.
-        self.end_in.pack()
-        
-        tk.Button(self.root, text="Finish & Calculate", command=self.finish).pack(pady=10) #prueba de git
+class ServicioNoDisponibleError(SistemaFJError):
+    """Excepción para cuando un servicio no se puede reservar."""
+    pass
 
-        tk.Label(self.root, text="Created by Fredy Tangarife - UNAD Student").pack() # Créditos del autor en la parte inferior.
+class OperacionNoPermitidaError(SistemaFJError):
+    """Excepción para transacciones de estado inválidas."""
+    pass
 
-    def add_res(self): # Proceso para crear una nueva reserva.
+# ==========================================
+# 3. CLASES ABSTRACTAS Y ENTIDADES BASE
+# ==========================================
+class EntidadGeneral(ABC):
+    """Clase abstracta que representa entidades generales del sistema."""
+    @abstractmethod
+    def mostrar_detalles(self):
+        pass
+
+class Cliente(EntidadGeneral):
+    """Clase con encapsulamiento estricto."""
+    def __init__(self, documento, nombre, correo):
+        self.__documento = self._validar_texto(documento, "Documento")
+        self.__nombre = self._validar_texto(nombre, "Nombre")
+        self.__correo = self._validar_correo(correo)
+
+    def _validar_texto(self, valor, campo):
+        if not valor or not isinstance(valor, str) or valor.strip() == "":
+            raise DatosInvalidosError(f"El campo '{campo}' no puede estar vacío.")
+        return valor.strip()
+
+    def _validar_correo(self, correo):
+        if "@" not in str(correo) or "." not in str(correo):
+            raise DatosInvalidosError("Formato de correo inválido.")
+        return correo.strip()
+    
+    # Getters
+    @property
+    def nombre(self): return self.__nombre
+    @property
+    def documento(self): return self.__documento
+    
+    def mostrar_detalles(self):
+        return f"Cliente: {self.__nombre} (Doc: {self.__documento})"
+
+class Servicio(EntidadGeneral):
+    """Clase abstracta para los servicios."""
+    def __init__(self, id_servicio, nombre, costo_base):
+        if costo_base < 0:
+            raise DatosInvalidosError("El costo base no puede ser negativo.")
+        self.id_servicio = id_servicio
+        self.nombre = nombre
+        self.costo_base = costo_base
+        self.disponible = True
+
+    @abstractmethod
+    def calcular_costo(self, *args, **kwargs):
+        """Método que será sobreescrito (polimorfismo) y 'sobrecargado' en las hijas."""
+        pass
+
+# ==========================================
+# 4. CLASES DERIVADAS (SERVICIOS) - Polimorfismo
+# ==========================================
+class ReservaSala(Servicio):
+    def __init__(self, id_servicio, nombre, costo_base, capacidad):
+        super().__init__(id_servicio, nombre, costo_base)
+        self.capacidad = capacidad
+
+    # Simulación de sobrecarga mediante parámetros opcionales
+    def calcular_costo(self, horas, incluye_catering=False):
+        costo = self.costo_base * horas
+        if incluye_catering:
+            costo += 50000  # Costo fijo extra
+        return costo
+
+    def mostrar_detalles(self):
+        return f"Sala '{self.nombre}' (Cap: {self.capacidad} pers.)"
+
+class AlquilerEquipo(Servicio):
+    def __init__(self, id_servicio, nombre, costo_base, requiere_deposito=True):
+        super().__init__(id_servicio, nombre, costo_base)
+        self.requiere_deposito = requiere_deposito
+
+    # Sobrecarga: cálculo diferente al de la sala
+    def calcular_costo(self, dias, aplicar_descuento=False):
+        costo = self.costo_base * dias
+        if aplicar_descuento and dias > 3:
+            costo *= 0.90  # 10% de descuento
+        return costo
+
+    def mostrar_detalles(self):
+        return f"Equipo '{self.nombre}' (Depósito: {'Sí' if self.requiere_deposito else 'No'})"
+
+class AsesoriaEspecializada(Servicio):
+    def __init__(self, id_servicio, nombre, costo_base, especialista):
+        super().__init__(id_servicio, nombre, costo_base)
+        self.especialista = especialista
+
+    def calcular_costo(self, horas, nivel_urgencia="normal"):
+        recargo = 1.5 if nivel_urgencia == "alta" else 1.0
+        return (self.costo_base * horas) * recargo
+
+    def mostrar_detalles(self):
+        return f"Asesoría en '{self.nombre}' con {self.especialista}"
+
+# ==========================================
+# 5. GESTIÓN DE RESERVAS
+# ==========================================
+class Reserva:
+    def __init__(self, cliente, servicio, duracion, **kwargs):
+        self.cliente = cliente
+        self.servicio = servicio
+        self.duracion = duracion
+        self.estado = "PENDIENTE"
+        self.parametros_extra = kwargs # Para los métodos sobrecargados de costo
+        self.costo_total = 0
+
+    def confirmar(self):
+        """Manejo de excepciones avanzado: try/except/else/finally"""
+        logging.info(f"Iniciando confirmación de reserva para {self.cliente.nombre}.")
         try:
-            r = ReservaSala(self.name_in.get(), self.rate_in.get()) # Crea instancia de ReservaSala
-            r.registrar_inicio(self.start_in.get())
-            self.reservations.append(r) # Guarda la reserva en la base de datos temporal.
-            self.lb.insert(tk.END, f"Res: {r.obtener_usuario()}") # Agrega el nombre del usuario a la lista visual.
-        except:
-            messagebox.showwarning("Warning", "Invalid input data")
+            if not self.servicio.disponible:
+                raise ServicioNoDisponibleError(f"El servicio '{self.servicio.nombre}' no está disponible.")
+            
+            # Polimorfismo en acción
+            self.costo_total = self.servicio.calcular_costo(self.duracion, **self.parametros_extra)
+            
+            # Simular un error de cálculo inconsistente si el costo es 0 o negativo
+            if self.costo_total <= 0:
+                raise ValueError("Error de sistema: El costo calculado es inconsistente (<= 0).")
 
-    def finish(self): # Proceso para liquidar y cobrar la reserva.
-        select = self.lb.curselection() # Detecta qué reserva elegiste con el ratón.
-        if select:
-            res = self.reservations[select[0]]
-            try:
-                cost = res.calcular_costo(self.end_in.get()) # Llama a la lógica para obtener el precio final.
-                messagebox.showinfo("Result", f"User: {res.obtener_usuario()}\nTotal: ${cost:.2f}") # Muestra el total a pagar en una ventana informativa.
-            except:
-                messagebox.showerror("Error", "Check End Time") # Muestra una ventana informativa si hay un error con el tiempo final.
+        except ServicioNoDisponibleError as e:
+            logging.error(f"Error de disponibilidad: {e}")
+            self.estado = "RECHAZADA"
+            raise  # Relanzar la excepción para que el main la capture
 
-if __name__ == "__main__": # Evita que el código se ejecute solo al ser importado.
-    root = tk.Tk() # Inicia el motor principal de la interfaz gráfica.
-    app = App(root) # Inicia tu aplicación dentro del motor de Windows.
-    root.mainloop() # Mantiene el programa abierto y atento a tus clics.
+        except ValueError as e:
+            logging.error(f"Error aritmético: {e}")
+            self.estado = "ERROR_CALCULO"
+            # Encadenamiento de excepciones
+            raise DatosInvalidosError("Fallo interno al calcular tarifas") from e 
+
+        except Exception as e:
+            logging.critical(f"Error inesperado: {e}")
+            self.estado = "ERROR_CRITICO"
+            raise
+
+        else:
+            # Se ejecuta SOLO si no hubo excepciones en el try
+            self.estado = "CONFIRMADA"
+            self.servicio.disponible = False
+            logging.info(f"Reserva CONFIRMADA. Total a pagar: ${self.costo_total}")
+
+        finally:
+            # Siempre se ejecuta, haya o no error
+            logging.info(f"Cierre de proceso de reserva. Estado final: {self.estado}")
+
+    def cancelar(self):
+        if self.estado == "CANCELADA":
+            raise OperacionNoPermitidaError("La reserva ya estaba cancelada.")
+        self.estado = "CANCELADA"
+        self.servicio.disponible = True
+        logging.info(f"Reserva de {self.cliente.nombre} cancelada exitosamente.")
+
+
+# ==========================================
+# 6. SIMULACIÓN DEL SISTEMA (10 OPERACIONES)
+# ==========================================
+def main():
+    print("Iniciando Sistema Software FJ...\nVerifique el archivo 'software_fj_logs.txt' para ver los registros.")
+    logging.info("--- NUEVA SESIÓN INICIADA ---")
+
+    # Listas internas (sin bases de datos)
+    clientes = []
+    servicios = []
+    reservas = []
+
+    print("\n--- SIMULANDO OPERACIONES ---")
+
+    # 1. Registro exitoso de cliente
+    try:
+        c1 = Cliente("1001", "Fredy Tangarife", "fredy@unad.edu.co")
+        clientes.append(c1)
+        logging.info(f"Cliente registrado: {c1.nombre}")
+    except Exception as e: print(e)
+
+    # 2. Registro fallido de cliente (Correo inválido)
+    try:
+        c_error = Cliente("1002", "Luis Gomez", "luis.sin.arroba.com")
+    except Exception as e:
+        logging.error(f"Fallo al registrar cliente 2: {e}")
+
+    # 3. Registro fallido de cliente (Nombre vacío)
+    try:
+        c_error2 = Cliente("1003", "", "juan@correo.com")
+    except Exception as e:
+        logging.error(f"Fallo al registrar cliente 3: {e}")
+
+    # 4. Creación de Servicios exitosa (Polimorfismo)
+    sala1 = ReservaSala("S01", "Sala Juntas A", 20000, 10)
+    equipo1 = AlquilerEquipo("E01", "Proyector 4K", 50000)
+    asesoria1 = AsesoriaEspecializada("A01", "Arquitectura de Software", 100000, "Jose Castro")
+    servicios.extend([sala1, equipo1, asesoria1])
+
+    # 5. Creación fallida de Servicio (Costo negativo)
+    try:
+        sala_error = ReservaSala("S02", "Sala VIP", -100, 5)
+    except Exception as e:
+        logging.error(f"Fallo al crear servicio: {e}")
+
+    # 6. Reserva exitosa (Uso de sobrecarga con incluye_catering=True)
+    try:
+        reserva1 = Reserva(c1, sala1, 4, incluye_catering=True)
+        reserva1.confirmar()
+        reservas.append(reserva1)
+    except Exception as e: print(e)
+
+    # 7. Intento de reserva de servicio ya ocupado
+    try:
+        c2 = Cliente("1004", "Diyein Botero", "diyein@correo.com")
+        clientes.append(c2)
+        reserva_fallida = Reserva(c2, sala1, 2) # sala1 ya no está disponible
+        reserva_fallida.confirmar()
+    except Exception as e:
+        print(f"Controlado en main - No se pudo reservar: {e}")
+
+    # 8. Reserva exitosa con cálculo sobrecargado (descuento)
+    try:
+        reserva2 = Reserva(c2, equipo1, 5, aplicar_descuento=True)
+        reserva2.confirmar()
+        reservas.append(reserva2)
+    except Exception as e: print(e)
+
+    # 9. Cancelación de reserva exitosa
+    try:
+        reserva1.cancelar()
+    except Exception as e: print(e)
+
+    # 10. Operación no permitida (Cancelar algo ya cancelado)
+    try:
+        reserva1.cancelar()
+    except Exception as e:
+        logging.warning(f"Intento de doble cancelación detectado: {e}")
+        print(f"Controlado en main - Error: {e}")
+
+    print("\nSimulación finalizada. Revisa el archivo 'software_fj_logs.txt'.")
+
+if __name__ == "__main__":
+    main()
