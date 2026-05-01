@@ -1,3 +1,10 @@
+"""
+Fase: Cimientos y Datos - Software FJ
+Estudiante: Fredy Andrés Tangarife Correa
+Descripción: Implementación de arquitectura POO base, validaciones 
+estrictas, interfaz gráfica y sistema de trazabilidad por logs.
+"""
+
 import tkinter as tk
 from tkinter import messagebox, ttk
 import re
