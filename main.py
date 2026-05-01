@@ -141,37 +141,51 @@ class AsesoriaEspecializada(Servicio):
 # ==========================================
 class Reserva:
     def __init__(self, cliente, servicio, duracion, **kwargs):
+        # Validaciones iniciales (mejora importante)
+        if cliente is None:
+            raise DatosInvalidosError("El cliente no puede ser nulo.")
+        if servicio is None:
+            raise ServicioNoDisponibleError("Debe especificar un servicio válido.")
+        if not isinstance(duracion, (int, float)) or duracion <= 0:
+            raise DatosInvalidosError("La duración debe ser un número mayor a 0.")
+
         self.cliente = cliente
         self.servicio = servicio
         self.duracion = duracion
         self.estado = "PENDIENTE"
-        self.parametros_extra = kwargs # Para los métodos sobrecargados de costo
+        self.parametros_extra = kwargs
         self.costo_total = 0
 
     def confirmar(self):
-        """Manejo de excepciones avanzado: try/except/else/finally"""
         logging.info(f"Iniciando confirmación de reserva para {self.cliente.nombre}.")
+
         try:
+            # Validar disponibilidad
             if not self.servicio.disponible:
-                raise ServicioNoDisponibleError(f"El servicio '{self.servicio.nombre}' no está disponible.")
-            
-            # Polimorfismo en acción
-            self.costo_total = self.servicio.calcular_costo(self.duracion, **self.parametros_extra)
-            
-            # Simular un error de cálculo inconsistente si el costo es 0 o negativo
+                raise ServicioNoDisponibleError(
+                    f"El servicio '{self.servicio.nombre}' no está disponible."
+                )
+
+            # Polimorfismo (cada servicio calcula distinto)
+            self.costo_total = self.servicio.calcular_costo(
+                self.duracion, **self.parametros_extra
+            )
+
+            # Validación de coherencia del costo
             if self.costo_total <= 0:
-                raise ValueError("Error de sistema: El costo calculado es inconsistente (<= 0).")
+                raise ValueError("El costo calculado es inválido.")
 
         except ServicioNoDisponibleError as e:
             logging.error(f"Error de disponibilidad: {e}")
             self.estado = "RECHAZADA"
-            raise  # Relanzar la excepción para que el main la capture
+            raise  # Mantiene la lógica del main
 
         except ValueError as e:
-            logging.error(f"Error aritmético: {e}")
+            logging.error(f"Error en cálculo: {e}")
             self.estado = "ERROR_CALCULO"
-            # Encadenamiento de excepciones
-            raise DatosInvalidosError("Fallo interno al calcular tarifas") from e 
+            raise DatosInvalidosError(
+                "Fallo interno al calcular el costo del servicio"
+            ) from e
 
         except Exception as e:
             logging.critical(f"Error inesperado: {e}")
@@ -179,21 +193,20 @@ class Reserva:
             raise
 
         else:
-            # Se ejecuta SOLO si no hubo excepciones en el try
             self.estado = "CONFIRMADA"
             self.servicio.disponible = False
-            logging.info(f"Reserva CONFIRMADA. Total a pagar: ${self.costo_total}")
+            logging.info(f"Reserva confirmada. Total: ${self.costo_total}")
 
         finally:
-            # Siempre se ejecuta, haya o no error
-            logging.info(f"Cierre de proceso de reserva. Estado final: {self.estado}")
+            logging.info(f"Proceso finalizado. Estado: {self.estado}")
 
     def cancelar(self):
         if self.estado == "CANCELADA":
-            raise OperacionNoPermitidaError("La reserva ya estaba cancelada.")
+            raise OperacionNoPermitidaError("La reserva ya fue cancelada.")
+
         self.estado = "CANCELADA"
         self.servicio.disponible = True
-        logging.info(f"Reserva de {self.cliente.nombre} cancelada exitosamente.")
+        logging.info(f"Reserva cancelada para {self.cliente.nombre}.")
 
 
 # ==========================================
