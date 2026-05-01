@@ -4,7 +4,8 @@ Estudiante: Fredy Andrés Tangarife Correa
 Descripción: Implementación de arquitectura POO base, validaciones 
 estrictas, interfaz gráfica y sistema de trazabilidad por logs.
 """
-
+#Librería encargada de la interfaz gráfica de usuario (GUI)
+# y la programación orientada a objetos.
 import tkinter as tk
 from tkinter import messagebox, ttk
 import re
