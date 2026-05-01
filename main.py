@@ -140,14 +140,21 @@ class AsesoriaEspecializada(Servicio):
 # 5. GESTIÓN DE RESERVAS
 # ==========================================
 class Reserva:
+    """
+    Clase que gestiona la relación entre Cliente y Servicio.
+    Implementa confirmación, cancelación y manejo avanzado de excepciones.
+    """
+
     def __init__(self, cliente, servicio, duracion, **kwargs):
-        # Validaciones iniciales (mejora importante)
-        if cliente is None:
-            raise DatosInvalidosError("El cliente no puede ser nulo.")
-        if servicio is None:
-            raise ServicioNoDisponibleError("Debe especificar un servicio válido.")
+        # Validaciones más robustas
+        if cliente is None or not hasattr(cliente, "nombre"):
+            raise DatosInvalidosError("Cliente inválido.")
+
+        if servicio is None or not hasattr(servicio, "calcular_costo"):
+            raise ServicioNoDisponibleError("Servicio inválido.")
+
         if not isinstance(duracion, (int, float)) or duracion <= 0:
-            raise DatosInvalidosError("La duración debe ser un número mayor a 0.")
+            raise DatosInvalidosError("La duración debe ser mayor a 0.")
 
         self.cliente = cliente
         self.servicio = servicio
@@ -157,58 +164,63 @@ class Reserva:
         self.costo_total = 0
 
     def confirmar(self):
-        logging.info(f"Iniciando confirmación de reserva para {self.cliente.nombre}.")
+        logging.info(f"Iniciando reserva para {self.cliente.nombre}")
 
         try:
             # Validar disponibilidad
-            if not self.servicio.disponible:
+            if not getattr(self.servicio, "disponible", False):
                 raise ServicioNoDisponibleError(
-                    f"El servicio '{self.servicio.nombre}' no está disponible."
+                    f"Servicio '{self.servicio.nombre}' no disponible"
                 )
 
-            # Polimorfismo (cada servicio calcula distinto)
+            # Calcular costo (polimorfismo)
             self.costo_total = self.servicio.calcular_costo(
                 self.duracion, **self.parametros_extra
             )
 
-            # Validación de coherencia del costo
+            # Validar costo
             if self.costo_total <= 0:
-                raise ValueError("El costo calculado es inválido.")
+                raise ValueError("Costo inválido")
 
         except ServicioNoDisponibleError as e:
-            logging.error(f"Error de disponibilidad: {e}")
             self.estado = "RECHAZADA"
-            raise  # Mantiene la lógica del main
+            logging.error(e)
+            raise
 
         except ValueError as e:
-            logging.error(f"Error en cálculo: {e}")
             self.estado = "ERROR_CALCULO"
-            raise DatosInvalidosError(
-                "Fallo interno al calcular el costo del servicio"
-            ) from e
+            logging.error(e)
+            raise DatosInvalidosError("Error en cálculo") from e
 
         except Exception as e:
-            logging.critical(f"Error inesperado: {e}")
             self.estado = "ERROR_CRITICO"
+            logging.critical(e)
             raise
 
         else:
             self.estado = "CONFIRMADA"
             self.servicio.disponible = False
-            logging.info(f"Reserva confirmada. Total: ${self.costo_total}")
+            logging.info(f"Reserva confirmada: ${self.costo_total}")
 
         finally:
-            logging.info(f"Proceso finalizado. Estado: {self.estado}")
+            logging.info(f"Estado final: {self.estado}")
 
     def cancelar(self):
-        if self.estado == "CANCELADA":
-            raise OperacionNoPermitidaError("La reserva ya fue cancelada.")
+        if self.estado in ["CANCELADA", "RECHAZADA"]:
+            raise OperacionNoPermitidaError("No se puede cancelar este estado.")
 
         self.estado = "CANCELADA"
         self.servicio.disponible = True
-        logging.info(f"Reserva cancelada para {self.cliente.nombre}.")
+        logging.info(f"Reserva cancelada: {self.cliente.nombre}")
 
-
+    def mostrar_resumen(self):
+        return (
+            f"Cliente: {self.cliente.nombre} | "
+            f"Servicio: {self.servicio.nombre} | "
+            f"Duración: {self.duracion} | "
+            f"Estado: {self.estado} | "
+            f"Costo: ${self.costo_total}"
+        )
 # ==========================================
 # 6. SIMULACIÓN DEL SISTEMA (10 OPERACIONES)
 # ==========================================
