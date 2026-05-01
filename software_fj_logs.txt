@@ -1,0 +1,48 @@
+2026-04-23 20:25:41,087 - INFO - --- NUEVA SESIÓN INICIADA ---
+2026-04-23 20:25:41,087 - INFO - Cliente registrado: Fredy Tangarife
+2026-04-23 20:25:41,089 - ERROR - Fallo al registrar cliente 2: Formato de correo inválido.
+2026-04-23 20:25:41,089 - ERROR - Fallo al registrar cliente 3: El campo 'Nombre' no puede estar vacío.
+2026-04-23 20:25:41,089 - ERROR - Fallo al crear servicio: El costo base no puede ser negativo.
+2026-04-23 20:25:41,089 - INFO - Iniciando confirmación de reserva para Fredy Tangarife.
+2026-04-23 20:25:41,089 - INFO - Reserva CONFIRMADA. Total a pagar: $130000
+2026-04-23 20:25:41,089 - INFO - Cierre de proceso de reserva. Estado final: CONFIRMADA
+2026-04-23 20:25:41,089 - INFO - Iniciando confirmación de reserva para Diyein Botero.
+2026-04-23 20:25:41,089 - ERROR - Error de disponibilidad: El servicio 'Sala Juntas A' no está disponible.
+2026-04-23 20:25:41,089 - INFO - Cierre de proceso de reserva. Estado final: RECHAZADA
+2026-04-23 20:25:41,089 - INFO - Iniciando confirmación de reserva para Diyein Botero.
+2026-04-23 20:25:41,089 - INFO - Reserva CONFIRMADA. Total a pagar: $225000.0
+2026-04-23 20:25:41,089 - INFO - Cierre de proceso de reserva. Estado final: CONFIRMADA
+2026-04-23 20:25:41,089 - INFO - Reserva de Fredy Tangarife cancelada exitosamente.
+2026-04-23 20:25:41,089 - WARNING - Intento de doble cancelación detectado: La reserva ya estaba cancelada.
+2026-04-23 20:26:38,434 - INFO - --- NUEVA SESIÓN INICIADA ---
+2026-04-23 20:26:38,436 - INFO - Cliente registrado: Fredy Tangarife
+2026-04-23 20:26:38,436 - ERROR - Fallo al registrar cliente 2: Formato de correo inválido.
+2026-04-23 20:26:38,436 - ERROR - Fallo al registrar cliente 3: El campo 'Nombre' no puede estar vacío.
+2026-04-23 20:26:38,436 - ERROR - Fallo al crear servicio: El costo base no puede ser negativo.
+2026-04-23 20:26:38,436 - INFO - Iniciando confirmación de reserva para Fredy Tangarife.
+2026-04-23 20:26:38,436 - INFO - Reserva CONFIRMADA. Total a pagar: $130000
+2026-04-23 20:26:38,436 - INFO - Cierre de proceso de reserva. Estado final: CONFIRMADA
+2026-04-23 20:26:38,436 - INFO - Iniciando confirmación de reserva para Diyein Botero.
+2026-04-23 20:26:38,436 - ERROR - Error de disponibilidad: El servicio 'Sala Juntas A' no está disponible.
+2026-04-23 20:26:38,436 - INFO - Cierre de proceso de reserva. Estado final: RECHAZADA
+2026-04-23 20:26:38,437 - INFO - Iniciando confirmación de reserva para Diyein Botero.
+2026-04-23 20:26:38,437 - INFO - Reserva CONFIRMADA. Total a pagar: $225000.0
+2026-04-23 20:26:38,437 - INFO - Cierre de proceso de reserva. Estado final: CONFIRMADA
+2026-04-23 20:26:38,437 - INFO - Reserva de Fredy Tangarife cancelada exitosamente.
+2026-04-23 20:26:38,437 - WARNING - Intento de doble cancelación detectado: La reserva ya estaba cancelada.
+2026-04-23 20:27:27,132 - INFO - --- NUEVA SESIÓN INICIADA ---
+2026-04-23 20:27:27,132 - INFO - Cliente registrado: Fredy Tangarife
+2026-04-23 20:27:27,132 - ERROR - Fallo al registrar cliente 2: Formato de correo inválido.
+2026-04-23 20:27:27,132 - ERROR - Fallo al registrar cliente 3: El campo 'Nombre' no puede estar vacío.
+2026-04-23 20:27:27,132 - ERROR - Fallo al crear servicio: El costo base no puede ser negativo.
+2026-04-23 20:27:27,132 - INFO - Iniciando confirmación de reserva para Fredy Tangarife.
+2026-04-23 20:27:27,132 - INFO - Reserva CONFIRMADA. Total a pagar: $130000
+2026-04-23 20:27:27,132 - INFO - Cierre de proceso de reserva. Estado final: CONFIRMADA
+2026-04-23 20:27:27,132 - INFO - Iniciando confirmación de reserva para Diyein Botero.
+2026-04-23 20:27:27,132 - ERROR - Error de disponibilidad: El servicio 'Sala Juntas A' no está disponible.
+2026-04-23 20:27:27,132 - INFO - Cierre de proceso de reserva. Estado final: RECHAZADA
+2026-04-23 20:27:27,132 - INFO - Iniciando confirmación de reserva para Diyein Botero.
+2026-04-23 20:27:27,132 - INFO - Reserva CONFIRMADA. Total a pagar: $225000.0
+2026-04-23 20:27:27,132 - INFO - Cierre de proceso de reserva. Estado final: CONFIRMADA
+2026-04-23 20:27:27,132 - INFO - Reserva de Fredy Tangarife cancelada exitosamente.
+2026-04-23 20:27:27,132 - WARNING - Intento de doble cancelación detectado: La reserva ya estaba cancelada.
