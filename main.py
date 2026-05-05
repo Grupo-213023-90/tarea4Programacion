@@ -1,141 +1,130 @@
 """
-Proyecto: Sistema Integral de Gestión - Software FJ
-Institución: Universidad Nacional Abierta y a Distancia (UNAD)
-Equipo de Desarrollo:
-- LUIS DAVID GOMEZ PINTO
-- JOSE GABRIEL CASTRO LOPEZ
-- JUAN ESTEBAN CARDENAS ALVAREZ
-- DIYEIN ERLENCY BOTERO BETANCOURT
-- FREDY ANDRES TANGARIFE CORREA
+Fase: Cimientos y Datos - Software FJ
+Estudiante: Fredy Andrés Tangarife Correa
+Descripción: Implementación de arquitectura POO base, validaciones 
+estrictas, interfaz gráfica y sistema de trazabilidad por logs.
 """
-
+#Librería encargada de la interfaz gráfica de usuario (GUI)
+# y la programación orientada a objetos.
+import tkinter as tk
+from tkinter import messagebox, ttk
+import re
 import logging
 from abc import ABC, abstractmethod
-from datetime import datetime
 
-# ==========================================
-# 1. CONFIGURACIÓN DE LOGS
-# ==========================================
+# =========================================================
+# 1. CONFIGURACIÓN DE LOGS (Registro de eventos y errores)
+# =========================================================
 logging.basicConfig(
-    filename='software_fj_logs.txt',
+    filename='sistema_software_fj.log',
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
 
-# ==========================================
-# 2. EXCEPCIONES PERSONALIZADAS
-# ==========================================
-class SistemaFJError(Exception):
-    """Clase base para excepciones del sistema."""
+# =========================================================
+# 2. EXCEPCIÓN PERSONALIZADA
+# =========================================================
+class DatoInvalidoError(Exception):
+    """Excepción lanzada cuando un dato no cumple con las validaciones estrictas."""
     pass
 
-class DatosInvalidosError(SistemaFJError):
-    """Excepción para datos faltantes o incorrectos."""
-    pass
+# =========================================================
+# 3. LÓGICA DE NEGOCIO (CAPA DE DATOS)
+# =========================================================
 
-class ServicioNoDisponibleError(SistemaFJError):
-    """Excepción para cuando un servicio no se puede reservar."""
-    pass
-
-class OperacionNoPermitidaError(SistemaFJError):
-    """Excepción para transacciones de estado inválidas."""
-    pass
-
-# ==========================================
-# 3. CLASES ABSTRACTAS Y ENTIDADES BASE
-# ==========================================
 class EntidadGeneral(ABC):
-    """Clase abstracta que representa entidades generales del sistema."""
+    """Clase abstracta que representa una entidad base en el sistema."""
+    
     @abstractmethod
     def mostrar_detalles(self):
+        """Método obligatorio para mostrar la información de la entidad."""
         pass
 
 class Cliente(EntidadGeneral):
-    """Clase con encapsulamiento estricto."""
-    def __init__(self, documento, nombre, correo):
-        self.__documento = self._validar_texto(documento, "Documento")
-        self.__nombre = self._validar_texto(nombre, "Nombre")
-        self.__correo = self._validar_correo(correo)
-
-    def _validar_texto(self, valor, campo):
-        if not valor or not isinstance(valor, str) or valor.strip() == "":
-            raise DatosInvalidosError(f"El campo '{campo}' no puede estar vacío.")
-        return valor.strip()
-
-    def _validar_correo(self, correo):
-        if "@" not in str(correo) or "." not in str(correo):
-            raise DatosInvalidosError("Formato de correo inválido.")
-        return correo.strip()
-    
-    # Getters
-    @property
-    def nombre(self): return self.__nombre
-    @property
-    def documento(self): return self.__documento
-    
-    def mostrar_detalles(self):
-        return f"Cliente: {self.__nombre} (Doc: {self.__documento})"
-
-class Servicio(EntidadGeneral):
-    """Clase abstracta para los servicios."""
-    def __init__(self, id_servicio, nombre, costo_base):
-        if costo_base < 0:
-            raise DatosInvalidosError("El costo base no puede ser negativo.")
-        self.id_servicio = id_servicio
+    """
+    Representa a un cliente del sistema Software FJ.
+    Implementa encapsulación, validaciones y propiedades.
+    """
+    def __init__(self, nombre, documento, correo):
+        # Atributos privados
+        self.__nombre = None
+        self.__documento = None
+        self.__correo = None
+        
+        # Uso de setters para validar desde la creación
         self.nombre = nombre
-        self.costo_base = costo_base
-        self.disponible = True
+        self.documento = documento
+        self.correo = correo
+        logging.info(f"Instancia de Cliente creada: {self.nombre}")
 
-    @abstractmethod
-    def calcular_costo(self, *args, **kwargs):
-        """Método que será sobreescrito (polimorfismo) y 'sobrecargado' en las hijas."""
-        pass
+    # --- Propiedades con decoradores @property ---
 
-# ==========================================
-# 4. CLASES DERIVADAS (SERVICIOS) - Polimorfismo
-# ==========================================
-class ReservaSala(Servicio):
-    def __init__(self, id_servicio, nombre, costo_base, capacidad):
-        super().__init__(id_servicio, nombre, costo_base)
-        self.capacidad = capacidad
+    @property
+    def nombre(self):
+        return self.__nombre
 
-    # Simulación de sobrecarga mediante parámetros opcionales
-    def calcular_costo(self, horas, incluye_catering=False):
-        costo = self.costo_base * horas
-        if incluye_catering:
-            costo += 50000  # Costo fijo extra
-        return costo
+    @nombre.setter
+    def nombre(self, valor):
+        """Valida que el nombre solo contenga letras y espacios."""
+        if not re.match(r"^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]{3,50}$", valor):
+            raise DatoInvalidoError("El nombre debe tener solo letras (mín. 3).")
+        self.__nombre = valor
 
-    def mostrar_detalles(self):
-        return f"Sala '{self.nombre}' (Cap: {self.capacidad} pers.)"
+    @property
+    def documento(self):
+        return self.__documento
 
-class AlquilerEquipo(Servicio):
-    def __init__(self, id_servicio, nombre, costo_base, requiere_deposito=True):
-        super().__init__(id_servicio, nombre, costo_base)
-        self.requiere_deposito = requiere_deposito
+    @documento.setter
+    def documento(self, valor):
+        """Valida que el documento sea numérico de 7 a 12 dígitos."""
+        if not re.match(r"^\d{7,12}$", valor):
+            raise DatoInvalidoError("El documento debe ser numérico (7-12 dígitos).")
+        self.__documento = valor
 
-    # Sobrecarga: cálculo diferente al de la sala
-    def calcular_costo(self, dias, aplicar_descuento=False):
-        costo = self.costo_base * dias
-        if aplicar_descuento and dias > 3:
-            costo *= 0.90  # 10% de descuento
-        return costo
+    @property
+    def correo(self):
+        return self.__correo
 
-    def mostrar_detalles(self):
-        return f"Equipo '{self.nombre}' (Depósito: {'Sí' if self.requiere_deposito else 'No'})"
-
-class AsesoriaEspecializada(Servicio):
-    def __init__(self, id_servicio, nombre, costo_base, especialista):
-        super().__init__(id_servicio, nombre, costo_base)
-        self.especialista = especialista
-
-    def calcular_costo(self, horas, nivel_urgencia="normal"):
-        recargo = 1.5 if nivel_urgencia == "alta" else 1.0
-        return (self.costo_base * horas) * recargo
+    @correo.setter
+    def correo(self, valor):
+        """Valida el formato de correo electrónico."""
+        patron = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+        if not re.match(patron, valor):
+            raise DatoInvalidoError("El formato de correo es inválido.")
+        self.__correo = valor
 
     def mostrar_detalles(self):
-        return f"Asesoría en '{self.nombre}' con {self.especialista}"
+        """Devuelve una cadena con los datos del cliente."""
+        return f"NOMBRE: {self.__nombre} | DOC: {self.__documento} | EMAIL: {self.__correo}"
 
+# =========================================================
+# 4. INTERFAZ GRÁFICA (TKINTER)
+# =========================================================
+
+class VentanaPrincipal:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Software FJ - Gestión de Clientes (Fase Cimientos)")
+        self.root.geometry("600x450")
+        self.root.configure(bg="#f0f0f0")
+
+        # Lista interna para simular "base de datos" en memoria
+        self.lista_clientes = []
+
+        # --- Estilos ---
+        style = ttk.Style()
+        style.configure("TButton", font=("Arial", 10, "bold"))
+        style.configure("TLabel", background="#f0f0f0", font=("Arial", 10))
+
+        # --- Widgets de Entrada ---
+        frame_entrada = ttk.LabelFrame(self.root, text=" Registro de Nuevo Cliente ", padding=10)
+        frame_entrada.pack(pady=20, padx=20, fill="x")
+
+        ttk.Label(frame_entrada, text="Nombre Completo:").grid(row=0, column=0, sticky="w", pady=5)
+        self.ent_nombre = ttk.Entry(frame_entrada, width=40)
+        self.ent_nombre.grid(row=0, column=1, pady=5)
+
+<<<<<<< HEAD
 # ==========================================
 # 5. GESTIÓN DE RESERVAS
 # ==========================================
@@ -303,5 +292,72 @@ def main():
 
     print("\nSimulación finalizada. Revisa el archivo 'software_fj_logs.txt'.")
 
+=======
+        ttk.Label(frame_entrada, text="Documento:").grid(row=1, column=0, sticky="w", pady=5)
+        self.ent_documento = ttk.Entry(frame_entrada, width=40)
+        self.ent_documento.grid(row=1, column=1, pady=5)
+
+        ttk.Label(frame_entrada, text="Correo Electrónico:").grid(row=2, column=0, sticky="w", pady=5)
+        self.ent_correo = ttk.Entry(frame_entrada, width=40)
+        self.ent_correo.grid(row=2, column=1, pady=5)
+
+        # Botón de Registro
+        self.btn_registrar = ttk.Button(frame_entrada, text="Registrar Cliente", command=self.registrar_cliente)
+        self.btn_registrar.grid(row=3, column=0, columnspan=2, pady=15)
+
+        # --- Visualización de Datos ---
+        ttk.Label(self.root, text="Clientes Registrados:").pack(anchor="w", padx=25)
+        self.txt_visualizacion = tk.Text(self.root, height=10, width=70, state="disabled", font=("Courier", 9))
+        self.txt_visualizacion.pack(pady=10, padx=20)
+
+    def registrar_cliente(self):
+        """Captura los datos, crea el objeto y maneja excepciones."""
+        nombre = self.ent_nombre.get()
+        doc = self.ent_documento.get()
+        correo = self.ent_correo.get()
+
+        try:
+            # Intentar crear el objeto (aquí se disparan los @property setters)
+            nuevo_cliente = Cliente(nombre, doc, correo)
+            
+            # Si tiene éxito, agregar a la lista
+            self.lista_clientes.append(nuevo_cliente)
+            self.actualizar_pantalla(f"[ÉXITO] {nuevo_cliente.mostrar_detalles()}")
+            
+            # Limpiar campos
+            self.limpiar_campos()
+            messagebox.showinfo("Éxito", f"Cliente {nombre} registrado correctamente.")
+
+        except DatoInvalidoError as e:
+            # Error de validación de datos (Controlado)
+            messagebox.showwarning("Dato Inválido", str(e))
+            logging.warning(f"Error de validación en GUI: {e}")
+
+        except Exception as e:
+            # Error inesperado (Encadenamiento y Log)
+            messagebox.showerror("Error Crítico", "Ocurrió un error inesperado en el sistema.")
+            logging.critical(f"Error no controlado: {e}", exc_info=True)
+        
+        finally:
+            print("Intento de registro procesado.")
+
+    def actualizar_pantalla(self, mensaje):
+        """Actualiza el área de texto con la información más reciente."""
+        self.txt_visualizacion.config(state="normal")
+        self.txt_visualizacion.insert(tk.END, mensaje + "\n")
+        self.txt_visualizacion.config(state="disabled")
+
+    def limpiar_campos(self):
+        """Limpia los campos de entrada."""
+        self.ent_nombre.delete(0, tk.END)
+        self.ent_documento.delete(0, tk.END)
+        self.ent_correo.delete(0, tk.END)
+
+# =========================================================
+# 5. EJECUCIÓN DEL PROGRAMA
+# =========================================================
+>>>>>>> 303082e26a64962f13d161b9a6c3fe9fb8f09bf8
 if __name__ == "__main__":
-    main()
+    root = tk.Tk()
+    app = VentanaPrincipal(root)
+    root.mainloop()
