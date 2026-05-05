@@ -124,6 +124,175 @@ class VentanaPrincipal:
         self.ent_nombre = ttk.Entry(frame_entrada, width=40)
         self.ent_nombre.grid(row=0, column=1, pady=5)
 
+<<<<<<< HEAD
+# ==========================================
+# 5. GESTIÓN DE RESERVAS
+# ==========================================
+class Reserva:
+    """
+    Clase que gestiona la relación entre Cliente y Servicio.
+    Implementa confirmación, cancelación y manejo avanzado de excepciones.
+    """
+
+    def __init__(self, cliente, servicio, duracion, **kwargs):
+        # Validaciones más robustas
+        if cliente is None or not hasattr(cliente, "nombre"):
+            raise DatosInvalidosError("Cliente inválido.")
+
+        if servicio is None or not hasattr(servicio, "calcular_costo"):
+            raise ServicioNoDisponibleError("Servicio inválido.")
+
+        if not isinstance(duracion, (int, float)) or duracion <= 0:
+            raise DatosInvalidosError("La duración debe ser mayor a 0.")
+
+        self.cliente = cliente
+        self.servicio = servicio
+        self.duracion = duracion
+        self.estado = "PENDIENTE"
+        self.parametros_extra = kwargs
+        self.costo_total = 0
+
+    def confirmar(self):
+        logging.info(f"Iniciando reserva para {self.cliente.nombre}")
+
+        try:
+            # Validar disponibilidad
+            if not getattr(self.servicio, "disponible", False):
+                raise ServicioNoDisponibleError(
+                    f"Servicio '{self.servicio.nombre}' no disponible"
+                )
+
+            # Calcular costo (polimorfismo)
+            self.costo_total = self.servicio.calcular_costo(
+                self.duracion, **self.parametros_extra
+            )
+
+            # Validar costo
+            if self.costo_total <= 0:
+                raise ValueError("Costo inválido")
+
+        except ServicioNoDisponibleError as e:
+            self.estado = "RECHAZADA"
+            logging.error(e)
+            raise
+
+        except ValueError as e:
+            self.estado = "ERROR_CALCULO"
+            logging.error(e)
+            raise DatosInvalidosError("Error en cálculo") from e
+
+        except Exception as e:
+            self.estado = "ERROR_CRITICO"
+            logging.critical(e)
+            raise
+
+        else:
+            self.estado = "CONFIRMADA"
+            self.servicio.disponible = False
+            logging.info(f"Reserva confirmada: ${self.costo_total}")
+
+        finally:
+            logging.info(f"Estado final: {self.estado}")
+
+    def cancelar(self):
+        if self.estado in ["CANCELADA", "RECHAZADA"]:
+            raise OperacionNoPermitidaError("No se puede cancelar este estado.")
+
+        self.estado = "CANCELADA"
+        self.servicio.disponible = True
+        logging.info(f"Reserva cancelada: {self.cliente.nombre}")
+
+    def mostrar_resumen(self):
+        return (
+            f"Cliente: {self.cliente.nombre} | "
+            f"Servicio: {self.servicio.nombre} | "
+            f"Duración: {self.duracion} | "
+            f"Estado: {self.estado} | "
+            f"Costo: ${self.costo_total}"
+        )
+# ==========================================
+# 6. SIMULACIÓN DEL SISTEMA (10 OPERACIONES)
+# ==========================================
+def main():
+    print("Iniciando Sistema Software FJ...\nVerifique el archivo 'software_fj_logs.txt' para ver los registros.")
+    logging.info("--- NUEVA SESIÓN INICIADA ---")
+
+    # Listas internas (sin bases de datos)
+    clientes = []
+    servicios = []
+    reservas = []
+
+    print("\n--- SIMULANDO OPERACIONES ---")
+
+    # 1. Registro exitoso de cliente
+    try:
+        c1 = Cliente("1001", "Fredy Tangarife", "fredy@unad.edu.co")
+        clientes.append(c1)
+        logging.info(f"Cliente registrado: {c1.nombre}")
+    except Exception as e: print(e)
+
+    # 2. Registro fallido de cliente (Correo inválido)
+    try:
+        c_error = Cliente("1002", "Luis Gomez", "luis.sin.arroba.com")
+    except Exception as e:
+        logging.error(f"Fallo al registrar cliente 2: {e}")
+
+    # 3. Registro fallido de cliente (Nombre vacío)
+    try:
+        c_error2 = Cliente("1003", "", "juan@correo.com")
+    except Exception as e:
+        logging.error(f"Fallo al registrar cliente 3: {e}")
+
+    # 4. Creación de Servicios exitosa (Polimorfismo)
+    sala1 = ReservaSala("S01", "Sala Juntas A", 20000, 10)
+    equipo1 = AlquilerEquipo("E01", "Proyector 4K", 50000)
+    asesoria1 = AsesoriaEspecializada("A01", "Arquitectura de Software", 100000, "Jose Castro")
+    servicios.extend([sala1, equipo1, asesoria1])
+
+    # 5. Creación fallida de Servicio (Costo negativo)
+    try:
+        sala_error = ReservaSala("S02", "Sala VIP", -100, 5)
+    except Exception as e:
+        logging.error(f"Fallo al crear servicio: {e}")
+
+    # 6. Reserva exitosa (Uso de sobrecarga con incluye_catering=True)
+    try:
+        reserva1 = Reserva(c1, sala1, 4, incluye_catering=True)
+        reserva1.confirmar()
+        reservas.append(reserva1)
+    except Exception as e: print(e)
+
+    # 7. Intento de reserva de servicio ya ocupado
+    try:
+        c2 = Cliente("1004", "Diyein Botero", "diyein@correo.com")
+        clientes.append(c2)
+        reserva_fallida = Reserva(c2, sala1, 2) # sala1 ya no está disponible
+        reserva_fallida.confirmar()
+    except Exception as e:
+        print(f"Controlado en main - No se pudo reservar: {e}")
+
+    # 8. Reserva exitosa con cálculo sobrecargado (descuento)
+    try:
+        reserva2 = Reserva(c2, equipo1, 5, aplicar_descuento=True)
+        reserva2.confirmar()
+        reservas.append(reserva2)
+    except Exception as e: print(e)
+
+    # 9. Cancelación de reserva exitosa
+    try:
+        reserva1.cancelar()
+    except Exception as e: print(e)
+
+    # 10. Operación no permitida (Cancelar algo ya cancelado)
+    try:
+        reserva1.cancelar()
+    except Exception as e:
+        logging.warning(f"Intento de doble cancelación detectado: {e}")
+        print(f"Controlado en main - Error: {e}")
+
+    print("\nSimulación finalizada. Revisa el archivo 'software_fj_logs.txt'.")
+
+=======
         ttk.Label(frame_entrada, text="Documento:").grid(row=1, column=0, sticky="w", pady=5)
         self.ent_documento = ttk.Entry(frame_entrada, width=40)
         self.ent_documento.grid(row=1, column=1, pady=5)
@@ -187,6 +356,7 @@ class VentanaPrincipal:
 # =========================================================
 # 5. EJECUCIÓN DEL PROGRAMA
 # =========================================================
+>>>>>>> 303082e26a64962f13d161b9a6c3fe9fb8f09bf8
 if __name__ == "__main__":
     root = tk.Tk()
     app = VentanaPrincipal(root)
