@@ -1,193 +1,133 @@
 """
-Fase: Cimientos y Datos - Software FJ
-Estudiante: Fredy Andrés Tangarife Correa
-Descripción: Implementación de arquitectura POO base, validaciones 
-estrictas, interfaz gráfica y sistema de trazabilidad por logs.
+Módulo: main.py
+Descripción: Punto de entrada principal de la aplicación. 
+Contiene la interfaz gráfica (GUI) construida con Tkinter y actúa como 
+orquestador, uniendo las clases de entidades.py y servicios.py.
+Maneja las excepciones para asegurar que el sistema no colapse.
 """
-#Librería encargada de la interfaz gráfica de usuario (GUI)
-# y la programación orientada a objetos.
+
 import tkinter as tk
-from tkinter import messagebox, ttk
-import re
-import logging
-from abc import ABC, abstractmethod
+from tkinter import ttk, messagebox
 
-# =========================================================
-# 1. CONFIGURACIÓN DE LOGS (Registro de eventos y errores)
-# =========================================================
-logging.basicConfig(
-    filename='sistema_software_fj.log',
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
+# Importamos las clases definidas en los módulos anteriores
+from entidades import Cliente
+from servicios import ReservaSala, AlquilerEquipo, AsesoriaEspecializada
 
-# =========================================================
-# 2. EXCEPCIÓN PERSONALIZADA
-# =========================================================
-class DatoInvalidoError(Exception):
-    """Excepción lanzada cuando un dato no cumple con las validaciones estrictas."""
-    pass
-
-# =========================================================
-# 3. LÓGICA DE NEGOCIO (CAPA DE DATOS)
-# =========================================================
-
-class EntidadGeneral(ABC):
-    """Clase abstracta que representa una entidad base en el sistema."""
-    
-    @abstractmethod
-    def mostrar_detalles(self):
-        """Método obligatorio para mostrar la información de la entidad."""
-        pass
-
-class Cliente(EntidadGeneral):
-    """
-    Representa a un cliente del sistema Software FJ.
-    Implementa encapsulación, validaciones y propiedades.
-    """
-    def __init__(self, nombre, documento, correo):
-        # Atributos privados
-        self.__nombre = None
-        self.__documento = None
-        self.__correo = None
-        
-        # Uso de setters para validar desde la creación
-        self.nombre = nombre
-        self.documento = documento
-        self.correo = correo
-        logging.info(f"Instancia de Cliente creada: {self.nombre}")
-
-    # --- Propiedades con decoradores @property ---
-
-    @property
-    def nombre(self):
-        return self.__nombre
-
-    @nombre.setter
-    def nombre(self, valor):
-        """Valida que el nombre solo contenga letras y espacios."""
-        if not re.match(r"^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]{3,50}$", valor):
-            raise DatoInvalidoError("El nombre debe tener solo letras (mín. 3).")
-        self.__nombre = valor
-
-    @property
-    def documento(self):
-        return self.__documento
-
-    @documento.setter
-    def documento(self, valor):
-        """Valida que el documento sea numérico de 7 a 12 dígitos."""
-        if not re.match(r"^\d{7,12}$", valor):
-            raise DatoInvalidoError("El documento debe ser numérico (7-12 dígitos).")
-        self.__documento = valor
-
-    @property
-    def correo(self):
-        return self.__correo
-
-    @correo.setter
-    def correo(self, valor):
-        """Valida el formato de correo electrónico."""
-        patron = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-        if not re.match(patron, valor):
-            raise DatoInvalidoError("El formato de correo es inválido.")
-        self.__correo = valor
-
-    def mostrar_detalles(self):
-        """Devuelve una cadena con los datos del cliente."""
-        return f"NOMBRE: {self.__nombre} | DOC: {self.__documento} | EMAIL: {self.__correo}"
-
-# =========================================================
-# 4. INTERFAZ GRÁFICA (TKINTER)
-# =========================================================
-
-class VentanaPrincipal:
+class AppSoftwareFJ:
+    """Clase principal de la aplicación GUI."""
     def __init__(self, root):
         self.root = root
-        self.root.title("Software FJ - Gestión de Clientes (Fase Cimientos)")
-        self.root.geometry("600x450")
-        self.root.configure(bg="#f0f0f0")
-
-        # Lista interna para simular "base de datos" en memoria
-        self.lista_clientes = []
-
-        # --- Estilos ---
-        style = ttk.Style()
-        style.configure("TButton", font=("Arial", 10, "bold"))
-        style.configure("TLabel", background="#f0f0f0", font=("Arial", 10))
-
-        # --- Widgets de Entrada ---
-        frame_entrada = ttk.LabelFrame(self.root, text=" Registro de Nuevo Cliente ", padding=10)
-        frame_entrada.pack(pady=20, padx=20, fill="x")
-
-        ttk.Label(frame_entrada, text="Nombre Completo:").grid(row=0, column=0, sticky="w", pady=5)
-        self.ent_nombre = ttk.Entry(frame_entrada, width=40)
-        self.ent_nombre.grid(row=0, column=1, pady=5)
-
-        ttk.Label(frame_entrada, text="Documento:").grid(row=1, column=0, sticky="w", pady=5)
-        self.ent_documento = ttk.Entry(frame_entrada, width=40)
-        self.ent_documento.grid(row=1, column=1, pady=5)
-
-        ttk.Label(frame_entrada, text="Correo Electrónico:").grid(row=2, column=0, sticky="w", pady=5)
-        self.ent_correo = ttk.Entry(frame_entrada, width=40)
-        self.ent_correo.grid(row=2, column=1, pady=5)
-
-        # Botón de Registro
-        self.btn_registrar = ttk.Button(frame_entrada, text="Registrar Cliente", command=self.registrar_cliente)
-        self.btn_registrar.grid(row=3, column=0, columnspan=2, pady=15)
-
-        # --- Visualización de Datos ---
-        ttk.Label(self.root, text="Clientes Registrados:").pack(anchor="w", padx=25)
-        self.txt_visualizacion = tk.Text(self.root, height=10, width=70, state="disabled", font=("Courier", 9))
-        self.txt_visualizacion.pack(pady=10, padx=20)
-
-    def registrar_cliente(self):
-        """Captura los datos, crea el objeto y maneja excepciones."""
-        nombre = self.ent_nombre.get()
-        doc = self.ent_documento.get()
-        correo = self.ent_correo.get()
-
-        try:
-            # Intentar crear el objeto (aquí se disparan los @property setters)
-            nuevo_cliente = Cliente(nombre, doc, correo)
-            
-            # Si tiene éxito, agregar a la lista
-            self.lista_clientes.append(nuevo_cliente)
-            self.actualizar_pantalla(f"[ÉXITO] {nuevo_cliente.mostrar_detalles()}")
-            
-            # Limpiar campos
-            self.limpiar_campos()
-            messagebox.showinfo("Éxito", f"Cliente {nombre} registrado correctamente.")
-
-        except DatoInvalidoError as e:
-            # Error de validación de datos (Controlado)
-            messagebox.showwarning("Dato Inválido", str(e))
-            logging.warning(f"Error de validación en GUI: {e}")
-
-        except Exception as e:
-            # Error inesperado (Encadenamiento y Log)
-            messagebox.showerror("Error Crítico", "Ocurrió un error inesperado en el sistema.")
-            logging.critical(f"Error no controlado: {e}", exc_info=True)
+        self.root.title("Software FJ - Gestión de Servicios")
+        self.root.geometry("500x650")
         
-        finally:
-            print("Intento de registro procesado.")
+        # Llamada a la construcción de los elementos visuales
+        self._crear_interfaz()
 
-    def actualizar_pantalla(self, mensaje):
-        """Actualiza el área de texto con la información más reciente."""
-        self.txt_visualizacion.config(state="normal")
-        self.txt_visualizacion.insert(tk.END, mensaje + "\n")
-        self.txt_visualizacion.config(state="disabled")
+    def _crear_interfaz(self):
+        """Dibuja todos los widgets necesarios en la ventana."""
+        main_frame = ttk.Frame(self.root, padding="20")
+        main_frame.pack(fill=tk.BOTH, expand=True)
 
-    def limpiar_campos(self):
-        """Limpia los campos de entrada."""
-        self.ent_nombre.delete(0, tk.END)
-        self.ent_documento.delete(0, tk.END)
-        self.ent_correo.delete(0, tk.END)
+        # SECCIÓN DE DATOS PERSONALES
+        ttk.Label(main_frame, text="DATOS DEL CLIENTE", font=("Arial", 11, "bold")).pack(pady=5)
+        
+        ttk.Label(main_frame, text="Nombre Completo:").pack(anchor="w")
+        self.ent_nombre = ttk.Entry(main_frame)
+        self.ent_nombre.pack(fill="x", pady=2)
 
-# =========================================================
-# 5. EJECUCIÓN DEL PROGRAMA
-# =========================================================
+        ttk.Label(main_frame, text="Documento:").pack(anchor="w")
+        self.ent_doc = ttk.Entry(main_frame)
+        self.ent_doc.pack(fill="x", pady=2)
+
+        ttk.Label(main_frame, text="Correo Electrónico:").pack(anchor="w")
+        self.ent_correo = ttk.Entry(main_frame)
+        self.ent_correo.pack(fill="x", pady=2)
+
+        # SECCIÓN DE SERVICIOS
+        ttk.Label(main_frame, text="DETALLES DEL SERVICIO", font=("Arial", 11, "bold")).pack(pady=15)
+        
+        ttk.Label(main_frame, text="Seleccione Servicio:").pack(anchor="w")
+        self.combo_servicio = ttk.Combobox(main_frame, state="readonly", values=[
+            "Reserva de Sala", "Alquiler de Equipo", "Asesoría Especializada"
+        ])
+        self.combo_servicio.pack(fill="x", pady=2)
+        self.combo_servicio.current(0)
+
+        # Entrada para valor digitado por el usuario
+        ttk.Label(main_frame, text="Valor de la Hora/Día ($):").pack(anchor="w")
+        self.ent_valor_base = ttk.Entry(main_frame)
+        self.ent_valor_base.pack(fill="x", pady=2)
+
+        ttk.Label(main_frame, text="Cantidad (Horas o Días):").pack(anchor="w")
+        self.ent_cant = ttk.Entry(main_frame)
+        self.ent_cant.pack(fill="x", pady=2)
+
+        # Botón procesador
+        self.btn_procesar = ttk.Button(main_frame, text="CALCULAR Y REGISTRAR", command=self.procesar_datos)
+        self.btn_procesar.pack(pady=20)
+
+        # Área de log de resultados
+        self.txt_output = tk.Text(main_frame, height=10, font=("Consolas", 9), state="disabled", bg="#f0f0f0")
+        self.txt_output.pack(fill="both", expand=True)
+
+    def procesar_datos(self):
+        """
+        Captura datos, maneja excepciones e integra los módulos.
+        Garantiza que el sistema no se detenga por errores de usuario.
+        """
+        try:
+            # Validación de entradas numéricas iniciales
+            raw_cant = self.ent_cant.get()
+            raw_valor = self.ent_valor_base.get()
+
+            if not raw_cant.isdigit() or not raw_valor.replace('.', '', 1).isdigit():
+                raise ValueError("La cantidad y el valor base deben ser números válidos.")
+            
+            cant = int(raw_cant)
+            valor_base = float(raw_valor)
+
+            # Instanciación del Cliente (Activa validaciones de entidades.py)
+            cli = Cliente(self.ent_nombre.get(), self.ent_doc.get(), self.ent_correo.get())
+            
+            # Instanciación polimórfica del Servicio (Fase 2)
+            tipo = self.combo_servicio.get()
+            
+            if tipo == "Reserva de Sala":
+                srv = ReservaSala("SRV-001", cant, valor_base)
+            elif tipo == "Alquiler de Equipo":
+                srv = AlquilerEquipo("SRV-002", cant, valor_base)
+            else:
+                srv = AsesoriaEspecializada("SRV-003", cant, valor_base)
+
+            # Ejecución de la lógica de negocio
+            costo_final = srv.calcular_costo()
+            
+            # Formateo del resumen para el usuario
+            resumen = (
+                f"--- OPERACIÓN EXITOSA ---\n"
+                f"{cli.mostrar_detalles()}\n"  # Muestra nombre, documento y correo
+                f"Servicio: {srv.nombre}\n"
+                f"Valor Unitario: ${valor_base:,.0f}\n"
+                f"Costo Final: ${costo_final:,.0f}\n"
+                f"--------------------------"
+            )
+            self._actualizar_log(resumen)
+
+        except ValueError as e:
+            # Captura errores de validación de las clases
+            messagebox.showwarning("Dato Inválido", f"Atención: {e}")
+        except Exception as e:
+            # Captura errores críticos inesperados
+            messagebox.showerror("Fallo de Sistema", f"Ocurrió un error inesperado: {e}")
+
+    def _actualizar_log(self, texto):
+        """Método auxiliar para refrescar el cuadro de texto de salida."""
+        self.txt_output.config(state="normal")
+        self.txt_output.delete("1.0", tk.END)
+        self.txt_output.insert(tk.END, texto)
+        self.txt_output.config(state="disabled")
+
 if __name__ == "__main__":
     root = tk.Tk()
-    app = VentanaPrincipal(root)
+    app = AppSoftwareFJ(root)
     root.mainloop()
