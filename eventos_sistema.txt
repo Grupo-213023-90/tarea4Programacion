@@ -1,0 +1,1 @@
+[2026-05-08 00:20:36] [GUI_ERROR] Error fatal: name 'mi_reserva' is not defined

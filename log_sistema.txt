@@ -1,0 +1,13 @@
+[2026-05-08 00:36:42] [INFO] Aplicación iniciada correctamente.
+[2026-05-08 00:37:10] [INFO] Validando reserva para: fredy tangarifee
+[2026-05-08 00:37:10] [EXITO] Reserva confirmada por $12,000
+[2026-05-08 00:37:10] [INFO] Finalizó intento de confirmación.
+[2026-05-08 00:37:38] [INFO] Validando reserva para: fredy tangarifee
+[2026-05-08 00:37:38] [EXITO] Reserva confirmada por $12,000
+[2026-05-08 00:37:38] [INFO] Finalizó intento de confirmación.
+[2026-05-08 00:37:47] [INFO] Validando reserva para: fredy tangarifee
+[2026-05-08 00:37:47] [EXITO] Reserva confirmada por $13,800
+[2026-05-08 00:37:47] [INFO] Finalizó intento de confirmación.
+[2026-05-08 00:37:55] [INFO] Validando reserva para: fredy tangarifee
+[2026-05-08 00:37:55] [EXITO] Reserva confirmada por $12,000
+[2026-05-08 00:37:55] [INFO] Finalizó intento de confirmación.

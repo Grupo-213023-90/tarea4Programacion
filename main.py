@@ -8,27 +8,36 @@ Maneja las excepciones para asegurar que el sistema no colapse.
 
 import tkinter as tk
 from tkinter import ttk, messagebox
+import sys
 
-# Importamos las clases definidas en los módulos anteriores
-from entidades import Cliente
-from servicios import ReservaSala, AlquilerEquipo, AsesoriaEspecializada
+# Intentar importar los módulos locales con manejo de errores inmediato
+try:
+    from entidades import Cliente
+    from servicios import ReservaSala, AlquilerEquipo, AsesoriaEspecializada
+    from logica import Reserva, SistemaLog
+    from excepciones import DatosInvalidosError
+except ImportError as e:
+    print(f"ERROR CRÍTICO: No se encontró un archivo necesario: {e}")
+    sys.exit()
 
 class AppSoftwareFJ:
-    """Clase principal de la aplicación GUI."""
     def __init__(self, root):
         self.root = root
-        self.root.title("Software FJ - Gestión de Servicios")
+        self.root.title("Software FJ - Gestión Integral")
         self.root.geometry("500x650")
         
-        # Llamada a la construcción de los elementos visuales
+        # Construir Interfaz
         self._crear_interfaz()
+        
+        # Registrar inicio en el Log (Fase 4)
+        SistemaLog.registrar("Aplicación iniciada correctamente.")
 
     def _crear_interfaz(self):
-        """Dibuja todos los widgets necesarios en la ventana."""
+        """Define los widgets de la ventana."""
         main_frame = ttk.Frame(self.root, padding="20")
         main_frame.pack(fill=tk.BOTH, expand=True)
 
-        # SECCIÓN DE DATOS PERSONALES
+        # SECCIÓN CLIENTE
         ttk.Label(main_frame, text="DATOS DEL CLIENTE", font=("Arial", 11, "bold")).pack(pady=5)
         
         ttk.Label(main_frame, text="Nombre Completo:").pack(anchor="w")
@@ -43,7 +52,7 @@ class AppSoftwareFJ:
         self.ent_correo = ttk.Entry(main_frame)
         self.ent_correo.pack(fill="x", pady=2)
 
-        # SECCIÓN DE SERVICIOS
+        # SECCIÓN SERVICIO
         ttk.Label(main_frame, text="DETALLES DEL SERVICIO", font=("Arial", 11, "bold")).pack(pady=15)
         
         ttk.Label(main_frame, text="Seleccione Servicio:").pack(anchor="w")
@@ -53,81 +62,79 @@ class AppSoftwareFJ:
         self.combo_servicio.pack(fill="x", pady=2)
         self.combo_servicio.current(0)
 
-        # Entrada para valor digitado por el usuario
-        ttk.Label(main_frame, text="Valor de la Hora/Día ($):").pack(anchor="w")
+        ttk.Label(main_frame, text="Valor Unitario ($):").pack(anchor="w")
         self.ent_valor_base = ttk.Entry(main_frame)
         self.ent_valor_base.pack(fill="x", pady=2)
 
-        ttk.Label(main_frame, text="Cantidad (Horas o Días):").pack(anchor="w")
+        ttk.Label(main_frame, text="Cantidad:").pack(anchor="w")
         self.ent_cant = ttk.Entry(main_frame)
         self.ent_cant.pack(fill="x", pady=2)
 
-        # Botón procesador
+        # BOTÓN
         self.btn_procesar = ttk.Button(main_frame, text="CALCULAR Y REGISTRAR", command=self.procesar_datos)
         self.btn_procesar.pack(pady=20)
 
-        # Área de log de resultados
+        # LOG VISUAL
         self.txt_output = tk.Text(main_frame, height=10, font=("Consolas", 9), state="disabled", bg="#f0f0f0")
         self.txt_output.pack(fill="both", expand=True)
 
     def procesar_datos(self):
-        """
-        Captura datos, maneja excepciones e integra los módulos.
-        Garantiza que el sistema no se detenga por errores de usuario.
-        """
+        """Lógica de negocio integrada con manejo de excepciones."""
         try:
-            # Validación de entradas numéricas iniciales
-            raw_cant = self.ent_cant.get()
-            raw_valor = self.ent_valor_base.get()
+            # Captura de datos
+            nombre = self.ent_nombre.get()
+            doc = self.ent_doc.get()
+            correo = self.ent_correo.get()
+            v_base = self.ent_valor_base.get()
+            cant = self.ent_cant.get()
 
-            if not raw_cant.isdigit() or not raw_valor.replace('.', '', 1).isdigit():
-                raise ValueError("La cantidad y el valor base deben ser números válidos.")
-            
-            cant = int(raw_cant)
-            valor_base = float(raw_valor)
+            # Validar que los campos no estén vacíos antes de instanciar
+            if not all([nombre, doc, correo, v_base, cant]):
+                raise DatosInvalidosError("Todos los campos son obligatorios.")
 
-            # Instanciación del Cliente (Activa validaciones de entidades.py)
-            cli = Cliente(self.ent_nombre.get(), self.ent_doc.get(), self.ent_correo.get())
+            # Instanciar Cliente
+            obj_cliente = Cliente(nombre, doc, correo)
             
-            # Instanciación polimórfica del Servicio (Fase 2)
+            # Instanciar Servicio
             tipo = self.combo_servicio.get()
-            
             if tipo == "Reserva de Sala":
-                srv = ReservaSala("SRV-001", cant, valor_base)
+                obj_servicio = ReservaSala("S01", int(cant), float(v_base))
             elif tipo == "Alquiler de Equipo":
-                srv = AlquilerEquipo("SRV-002", cant, valor_base)
+                obj_servicio = AlquilerEquipo("E01", int(cant), float(v_base))
             else:
-                srv = AsesoriaEspecializada("SRV-003", cant, valor_base)
+                obj_servicio = AsesoriaEspecializada("A01", int(cant), float(v_base))
 
-            # Ejecución de la lógica de negocio
-            costo_final = srv.calcular_costo()
-            
-            # Formateo del resumen para el usuario
-            resumen = (
-                f"--- OPERACIÓN EXITOSA ---\n"
-                f"{cli.mostrar_detalles()}\n"  # Muestra nombre, documento y correo
-                f"Servicio: {srv.nombre}\n"
-                f"Valor Unitario: ${valor_base:,.0f}\n"
-                f"Costo Final: ${costo_final:,.0f}\n"
-                f"--------------------------"
-            )
-            self._actualizar_log(resumen)
+            # Fase 3: Crear y confirmar Reserva
+            mi_reserva = Reserva(obj_cliente, obj_servicio)
+            resultado = mi_reserva.confirmar_reserva()
 
-        except ValueError as e:
-            # Captura errores de validación de las clases
-            messagebox.showwarning("Dato Inválido", f"Atención: {e}")
+            if mi_reserva.confirmada:
+                self._actualizar_log(mi_reserva.generar_comprobante())
+                messagebox.showinfo("Software FJ", resultado)
+            else:
+                messagebox.showwarning("Software FJ", resultado)
+
+        except (ValueError, DatosInvalidosError) as e:
+            messagebox.showwarning("Error de Datos", str(e))
+            SistemaLog.registrar(f"Error de validación: {e}", "WARNING")
         except Exception as e:
-            # Captura errores críticos inesperados
-            messagebox.showerror("Fallo de Sistema", f"Ocurrió un error inesperado: {e}")
+            messagebox.showerror("Error Crítico", f"Fallo inesperado: {e}")
+            SistemaLog.registrar(f"Error crítico: {e}", "CRITICAL")
 
     def _actualizar_log(self, texto):
-        """Método auxiliar para refrescar el cuadro de texto de salida."""
+        """Refresca el área de texto."""
         self.txt_output.config(state="normal")
         self.txt_output.delete("1.0", tk.END)
         self.txt_output.insert(tk.END, texto)
         self.txt_output.config(state="disabled")
 
+# =========================================================
+# ESTA PARTE ES LA QUE HACE QUE LA VENTANA SE MANTENGA ABIERTA
+# =========================================================
 if __name__ == "__main__":
-    root = tk.Tk()
-    app = AppSoftwareFJ(root)
-    root.mainloop()
+    try:
+        root = tk.Tk()
+        app = AppSoftwareFJ(root)
+        root.mainloop() # <--- OBLIGATORIO: Mantiene la app viva
+    except Exception as e:
+        print(f"No se pudo iniciar la interfaz: {e}")
