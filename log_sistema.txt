@@ -11,3 +11,164 @@
 [2026-05-08 00:37:55] [INFO] Validando reserva para: fredy tangarifee
 [2026-05-08 00:37:55] [EXITO] Reserva confirmada por $12,000
 [2026-05-08 00:37:55] [INFO] Finalizó intento de confirmación.
+[2026-05-08 21:16:56] [INFO] Sistema iniciado - Fase de Integración y Pruebas.
+[2026-05-08 21:18:54] [INFO] Validando reserva para: Fredy Andrés Tangarife Correa
+[2026-05-08 21:18:54] [EXITO] Reserva confirmada por $12,000
+[2026-05-08 21:18:54] [INFO] Finalizó intento de confirmación.
+[2026-05-08 21:19:19] [INFO] Validando reserva para: Fredy Andrés Tangarife Correa
+[2026-05-08 21:19:19] [EXITO] Reserva confirmada por $12,000
+[2026-05-08 21:19:19] [INFO] Finalizó intento de confirmación.
+[2026-05-08 21:19:26] [INFO] Validando reserva para: Fredy Andrés Tangarife Correa
+[2026-05-08 21:19:26] [EXITO] Reserva confirmada por $13,800
+[2026-05-08 21:19:26] [INFO] Finalizó intento de confirmación.
+[2026-05-08 21:19:36] [INFO] Validando reserva para: Fredy Andrés Tangarife Correa
+[2026-05-08 21:19:36] [EXITO] Reserva confirmada por $20,700
+[2026-05-08 21:19:36] [INFO] Finalizó intento de confirmación.
+[2026-05-08 21:19:49] [INFO] Validando reserva para: Juan Perez
+[2026-05-08 21:19:49] [EXITO] Reserva confirmada por $100,000
+[2026-05-08 21:19:49] [INFO] Finalizó intento de confirmación.
+[2026-05-08 21:19:49] [INFO] Validando reserva para: Ana
+[2026-05-08 21:19:49] [EXITO] Reserva confirmada por $162,000
+[2026-05-08 21:19:49] [INFO] Finalizó intento de confirmación.
+[2026-05-08 21:19:49] [CRITICAL] Simulación Caso 3 falló: El documento debe contener únicamente números.
+[2026-05-08 21:19:49] [INFO] Validando reserva para: Marta Gomez
+[2026-05-08 21:19:49] [ADVERTENCIA] Error controlado: El costo base debe ser mayor a cero.
+[2026-05-08 21:19:49] [INFO] Finalizó intento de confirmación.
+[2026-05-08 21:19:49] [INFO] Validando reserva para: Luis T.
+[2026-05-08 21:19:49] [EXITO] Reserva confirmada por $225,000
+[2026-05-08 21:19:49] [INFO] Finalizó intento de confirmación.
+[2026-05-08 21:19:49] [CRITICAL] Simulación Caso 6 falló: El formato del correo electrónico es inválido.
+[2026-05-08 21:19:49] [INFO] Validando reserva para: Fredy Tangarife
+[2026-05-08 21:19:49] [EXITO] Reserva confirmada por $517,500
+[2026-05-08 21:19:49] [INFO] Finalizó intento de confirmación.
+[2026-05-08 21:19:49] [CRITICAL] Simulación Caso 8 falló: Existen campos vacíos.
+[2026-05-08 21:19:49] [INFO] Validando reserva para: Elena Mar
+[2026-05-08 21:19:49] [EXITO] Reserva confirmada por $90,000
+[2026-05-08 21:19:49] [INFO] Finalizó intento de confirmación.
+[2026-05-08 21:19:49] [INFO] Validando reserva para: Roberto
+[2026-05-08 21:19:49] [EXITO] Reserva confirmada por $165,000
+[2026-05-08 21:19:49] [INFO] Finalizó intento de confirmación.
+[2026-05-08 21:19:54] [INFO] Validando reserva para: Juan Perez
+[2026-05-08 21:19:54] [EXITO] Reserva confirmada por $100,000
+[2026-05-08 21:19:54] [INFO] Finalizó intento de confirmación.
+[2026-05-08 21:19:54] [INFO] Validando reserva para: Ana
+[2026-05-08 21:19:54] [EXITO] Reserva confirmada por $162,000
+[2026-05-08 21:19:54] [INFO] Finalizó intento de confirmación.
+[2026-05-08 21:19:54] [CRITICAL] Simulación Caso 3 falló: El documento debe contener únicamente números.
+[2026-05-08 21:19:54] [INFO] Validando reserva para: Marta Gomez
+[2026-05-08 21:19:54] [ADVERTENCIA] Error controlado: El costo base debe ser mayor a cero.
+[2026-05-08 21:19:54] [INFO] Finalizó intento de confirmación.
+[2026-05-08 21:19:54] [INFO] Validando reserva para: Luis T.
+[2026-05-08 21:19:54] [EXITO] Reserva confirmada por $225,000
+[2026-05-08 21:19:54] [INFO] Finalizó intento de confirmación.
+[2026-05-08 21:19:54] [CRITICAL] Simulación Caso 6 falló: El formato del correo electrónico es inválido.
+[2026-05-08 21:19:54] [INFO] Validando reserva para: Fredy Tangarife
+[2026-05-08 21:19:54] [EXITO] Reserva confirmada por $517,500
+[2026-05-08 21:19:54] [INFO] Finalizó intento de confirmación.
+[2026-05-08 21:19:54] [CRITICAL] Simulación Caso 8 falló: Existen campos vacíos.
+[2026-05-08 21:19:54] [INFO] Validando reserva para: Elena Mar
+[2026-05-08 21:19:54] [EXITO] Reserva confirmada por $90,000
+[2026-05-08 21:19:54] [INFO] Finalizó intento de confirmación.
+[2026-05-08 21:19:54] [INFO] Validando reserva para: Roberto
+[2026-05-08 21:19:54] [EXITO] Reserva confirmada por $165,000
+[2026-05-08 21:19:54] [INFO] Finalizó intento de confirmación.
+[2026-05-08 21:21:43] [INFO] Validando reserva para: Fredy Andrés Tangarife Correa
+[2026-05-08 21:21:43] [EXITO] Reserva confirmada por $20,700
+[2026-05-08 21:21:43] [INFO] Finalizó intento de confirmación.
+[2026-05-08 22:19:16] [INFO] Validando reserva para: Juan Perez
+[2026-05-08 22:19:16] [EXITO] Reserva confirmada por $100,000
+[2026-05-08 22:19:16] [INFO] Finalizó intento de confirmación.
+[2026-05-08 22:19:16] [INFO] Validando reserva para: Ana
+[2026-05-08 22:19:16] [EXITO] Reserva confirmada por $162,000
+[2026-05-08 22:19:16] [INFO] Finalizó intento de confirmación.
+[2026-05-08 22:19:16] [CRITICAL] Simulación Caso 3 falló: El documento debe contener únicamente números.
+[2026-05-08 22:19:16] [INFO] Validando reserva para: Marta Gomez
+[2026-05-08 22:19:16] [ADVERTENCIA] Error controlado: El costo base debe ser mayor a cero.
+[2026-05-08 22:19:16] [INFO] Finalizó intento de confirmación.
+[2026-05-08 22:19:16] [INFO] Validando reserva para: Luis T.
+[2026-05-08 22:19:16] [EXITO] Reserva confirmada por $225,000
+[2026-05-08 22:19:16] [INFO] Finalizó intento de confirmación.
+[2026-05-08 22:19:16] [CRITICAL] Simulación Caso 6 falló: El formato del correo electrónico es inválido.
+[2026-05-08 22:19:16] [INFO] Validando reserva para: Fredy Tangarife
+[2026-05-08 22:19:16] [EXITO] Reserva confirmada por $517,500
+[2026-05-08 22:19:16] [INFO] Finalizó intento de confirmación.
+[2026-05-08 22:19:16] [CRITICAL] Simulación Caso 8 falló: Existen campos vacíos.
+[2026-05-08 22:19:16] [INFO] Validando reserva para: Elena Mar
+[2026-05-08 22:19:16] [EXITO] Reserva confirmada por $90,000
+[2026-05-08 22:19:16] [INFO] Finalizó intento de confirmación.
+[2026-05-08 22:19:16] [INFO] Validando reserva para: Roberto
+[2026-05-08 22:19:16] [EXITO] Reserva confirmada por $165,000
+[2026-05-08 22:19:16] [INFO] Finalizó intento de confirmación.
+[2026-05-08 22:19:32] [INFO] Validando reserva para: Juan Perez
+[2026-05-08 22:19:32] [EXITO] Reserva confirmada por $100,000
+[2026-05-08 22:19:32] [INFO] Finalizó intento de confirmación.
+[2026-05-08 22:19:32] [INFO] Validando reserva para: Ana
+[2026-05-08 22:19:32] [EXITO] Reserva confirmada por $162,000
+[2026-05-08 22:19:32] [INFO] Finalizó intento de confirmación.
+[2026-05-08 22:19:32] [CRITICAL] Simulación Caso 3 falló: El documento debe contener únicamente números.
+[2026-05-08 22:19:32] [INFO] Validando reserva para: Marta Gomez
+[2026-05-08 22:19:32] [ADVERTENCIA] Error controlado: El costo base debe ser mayor a cero.
+[2026-05-08 22:19:32] [INFO] Finalizó intento de confirmación.
+[2026-05-08 22:19:32] [INFO] Validando reserva para: Luis T.
+[2026-05-08 22:19:32] [EXITO] Reserva confirmada por $225,000
+[2026-05-08 22:19:32] [INFO] Finalizó intento de confirmación.
+[2026-05-08 22:19:32] [CRITICAL] Simulación Caso 6 falló: El formato del correo electrónico es inválido.
+[2026-05-08 22:19:32] [INFO] Validando reserva para: Fredy Tangarife
+[2026-05-08 22:19:32] [EXITO] Reserva confirmada por $517,500
+[2026-05-08 22:19:32] [INFO] Finalizó intento de confirmación.
+[2026-05-08 22:19:32] [CRITICAL] Simulación Caso 8 falló: Existen campos vacíos.
+[2026-05-08 22:19:32] [INFO] Validando reserva para: Elena Mar
+[2026-05-08 22:19:32] [EXITO] Reserva confirmada por $90,000
+[2026-05-08 22:19:32] [INFO] Finalizó intento de confirmación.
+[2026-05-08 22:19:32] [INFO] Validando reserva para: Roberto
+[2026-05-08 22:19:32] [EXITO] Reserva confirmada por $165,000
+[2026-05-08 22:19:32] [INFO] Finalizó intento de confirmación.
+[2026-05-09 00:26:47] [INFO] Sistema iniciado - Fase de Integración y Pruebas.
+[2026-05-09 00:26:56] [INFO] Validando reserva para: Juan Perez
+[2026-05-09 00:26:56] [EXITO] Reserva confirmada por $100,000
+[2026-05-09 00:26:56] [INFO] Finalizó intento de confirmación.
+[2026-05-09 00:26:56] [INFO] Validando reserva para: Ana
+[2026-05-09 00:26:56] [EXITO] Reserva confirmada por $162,000
+[2026-05-09 00:26:56] [INFO] Finalizó intento de confirmación.
+[2026-05-09 00:26:56] [CRITICAL] Simulación Caso 3 falló: El documento debe contener únicamente números.
+[2026-05-09 00:26:56] [INFO] Validando reserva para: Marta Gomez
+[2026-05-09 00:26:56] [ADVERTENCIA] Error controlado: El costo base debe ser mayor a cero.
+[2026-05-09 00:26:56] [INFO] Finalizó intento de confirmación.
+[2026-05-09 00:26:56] [INFO] Validando reserva para: Luis T.
+[2026-05-09 00:26:56] [EXITO] Reserva confirmada por $225,000
+[2026-05-09 00:26:56] [INFO] Finalizó intento de confirmación.
+[2026-05-09 00:26:56] [CRITICAL] Simulación Caso 6 falló: El formato del correo electrónico es inválido.
+[2026-05-09 00:26:56] [INFO] Validando reserva para: Fredy Tangarife
+[2026-05-09 00:26:56] [EXITO] Reserva confirmada por $517,500
+[2026-05-09 00:26:56] [INFO] Finalizó intento de confirmación.
+[2026-05-09 00:26:56] [CRITICAL] Simulación Caso 8 falló: Existen campos vacíos.
+[2026-05-09 00:26:56] [INFO] Validando reserva para: Elena Mar
+[2026-05-09 00:26:56] [EXITO] Reserva confirmada por $90,000
+[2026-05-09 00:26:56] [INFO] Finalizó intento de confirmación.
+[2026-05-09 00:26:56] [INFO] Validando reserva para: Roberto
+[2026-05-09 00:26:56] [EXITO] Reserva confirmada por $165,000
+[2026-05-09 00:26:56] [INFO] Finalizó intento de confirmación.
+[2026-05-09 00:27:07] [INFO] Validando reserva para: Juan Perez
+[2026-05-09 00:27:07] [EXITO] Reserva confirmada por $100,000
+[2026-05-09 00:27:07] [INFO] Finalizó intento de confirmación.
+[2026-05-09 00:27:07] [INFO] Validando reserva para: Ana
+[2026-05-09 00:27:07] [EXITO] Reserva confirmada por $162,000
+[2026-05-09 00:27:07] [INFO] Finalizó intento de confirmación.
+[2026-05-09 00:27:07] [CRITICAL] Simulación Caso 3 falló: El documento debe contener únicamente números.
+[2026-05-09 00:27:07] [INFO] Validando reserva para: Marta Gomez
+[2026-05-09 00:27:07] [ADVERTENCIA] Error controlado: El costo base debe ser mayor a cero.
+[2026-05-09 00:27:07] [INFO] Finalizó intento de confirmación.
+[2026-05-09 00:27:07] [INFO] Validando reserva para: Luis T.
+[2026-05-09 00:27:07] [EXITO] Reserva confirmada por $225,000
+[2026-05-09 00:27:07] [INFO] Finalizó intento de confirmación.
+[2026-05-09 00:27:07] [CRITICAL] Simulación Caso 6 falló: El formato del correo electrónico es inválido.
+[2026-05-09 00:27:07] [INFO] Validando reserva para: Fredy Tangarife
+[2026-05-09 00:27:07] [EXITO] Reserva confirmada por $517,500
+[2026-05-09 00:27:07] [INFO] Finalizó intento de confirmación.
+[2026-05-09 00:27:07] [CRITICAL] Simulación Caso 8 falló: Existen campos vacíos.
+[2026-05-09 00:27:07] [INFO] Validando reserva para: Elena Mar
+[2026-05-09 00:27:07] [EXITO] Reserva confirmada por $90,000
+[2026-05-09 00:27:07] [INFO] Finalizó intento de confirmación.
+[2026-05-09 00:27:07] [INFO] Validando reserva para: Roberto
+[2026-05-09 00:27:07] [EXITO] Reserva confirmada por $165,000
+[2026-05-09 00:27:07] [INFO] Finalizó intento de confirmación.
